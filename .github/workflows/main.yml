@@ -1,5 +1,4 @@
 name: Daily Update
-
 on:
   schedule:
     - cron: '5 1 * * *'  # 每天早上北京时间09:05更新(UTC时间为1:05)
@@ -42,7 +41,7 @@ jobs:
           echo -e "$TIMESTAMP_SECTION" >> README.md
           
       - name: Auto commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "Auto deploy by Github Actions"
           commit_user_name: "github-actions[bot]"
