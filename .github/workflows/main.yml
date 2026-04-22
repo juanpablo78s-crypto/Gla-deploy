@@ -44,3 +44,10 @@ jobs:
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           file_pattern: README.md
+      startupProbe:
+      httpGet:
+      path: /healthz
+      port: 8080
+      failureThreshold: 30
+      initialDelaySeconds: 60
+      periodSeconds: 10
