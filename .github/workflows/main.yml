@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
           echo -e "$TIMESTAMP_SECTION" >> README.md
           
       - name: Auto commit changes
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Auto deploy by Github Actions"
           commit_user_name: "github-actions[bot]"
