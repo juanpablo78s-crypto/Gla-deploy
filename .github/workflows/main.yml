@@ -5,15 +5,18 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+      # 如果你需要权限来更新 Kubernetes 集群，这里也可以添加相关权限
+      # kubernetes: write
+
     steps:
-    
-      - name: Checkout
+
+      - name: Checkout repository
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,37 +40,49 @@ jobs:
           fi
           
           echo -e "$TIMESTAMP_SECTION" >> README.md
-          
-      - name: Auto commit changes
+
+      - name: Auto commit changes to README
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "Auto deploy by Github Actions"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
           file_pattern: README.md
-      apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: your-deployment-name
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: your-app-name
-  template:
-    metadata:
-      labels:
-        app: your-app-name
-    spec:
-      containers:
-        - name: your-container-name
-          image: your-image-name
-          ports:
-            - containerPort: 8080
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            failureThreshold: 30
-            initialDelaySeconds: 60
-            periodSeconds: 10
+
+      # 添加一个步骤来更新 Kubernetes 配置文件，假设你需要修改 Kubernetes 配置文件并部署
+      - name: Update Kubernetes Deployment with StartupProbe
+        run: |
+          # 生成包含 startupProbe 配置的 YAML 部署文件
+          cat <<EOL > k8s-deployment.yaml
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: your-deployment-name
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: your-app-name
+            template:
+              metadata:
+                labels:
+                  app: your-app-name
+              spec:
+                containers:
+                  - name: your-container-name
+                    image: your-image-name
+                    ports:
+                      - containerPort: 8080
+                    startupProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8080
+                      failureThreshold: 30
+                      initialDelaySeconds: 60
+                      periodSeconds: 10
+          EOL
+
+          # 应用新的部署配置到 Kubernetes 集群
+          kubectl apply -f k8s-deployment.yaml
+
+      # 其他步骤，比如清理或通知
